@@ -1,4 +1,4 @@
-
+//if you change anything here remember run --  npm run dev or npm run watch  --in terminal to compile and ctrl refresh to hard refresh
 // Fonts
 @import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
 
@@ -7,6 +7,9 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+//custom css no _ or .scss
+@import "custom";
 
 .navbar-laravel {
   background-color: #fff;
