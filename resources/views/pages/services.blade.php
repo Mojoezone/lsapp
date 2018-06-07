@@ -5,9 +5,9 @@
         <h1>{{$title}}</h1>
         {{-- count if there are more than one in the services array inside of data, set it as each of the item and loop it out --}}
         @if(count($services) > 0)
-            <ul>
+            <ul class="list-group">
                 @foreach($services as $service)
-                    <li>{{$service}}</li>
+                    <li class="list-group-item">{{$service}}</li>
                 @endforeach
             </ul>
         @endif
