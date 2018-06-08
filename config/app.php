@@ -159,6 +159,10 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        //for form from laravel collective
+        Collective\Html\HtmlServiceProvider::class,
+        //ck editor
+        Unisharp\Ckeditor\ServiceProvider::class,
 
     ],
 
@@ -208,6 +212,10 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+
+        //form laravel collective
+        'Form' => Collective\Html\FormFacade::class,
+        'Html' => Collective\Html\HtmlFacade::class,
 
     ],
 

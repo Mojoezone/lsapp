@@ -12,7 +12,14 @@
     <body>
         @include('inc.navbar')
         <div class="container">
-        @yield('content')
+            @include('inc.messages')
+            {{-- (@yield) within the layout that your pages which are extending the template will put their content into. --}}
+            @yield('content')
         </div>
+        <script src="/vendor/unisharp/laravel-ckeditor/ckeditor.js"></script>
+        <script>
+            // give the textarea an id -> article-ckeditor
+            CKEDITOR.replace( 'article-ckeditor' );
+        </script>
     </body>
 </html>

@@ -18,7 +18,11 @@
 // Route::get('/users/{id}', function ($id, $name) {
 //     return 'this is user '.$name.' with an id of '.$id;
 // });
+
+//php artisan route:list == listing all the available routes
 Route::get('/', 'PagesController@index');
 
 Route::get('/about', 'PagesController@about');
 Route::get('/services', 'PagesController@services');
+
+Route::resource('posts', 'PostsController');
