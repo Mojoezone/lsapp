@@ -24,8 +24,16 @@ class Post extends Model
     //same as page controller php artisan make:model Post -m ====== post is the model controller accesing the database and -m is database migration
 
     //cahnged table name---= protected $table = 'posts';
+    protected $table = 'posts';
 
     //change Primary key --= public $primaryKey = 'id';
+    public $primaryKey = 'id';
 
     //Timestamp public $timestamps = true;
+    public $timestamps = true;
+
+    public function user(){
+        //Post is belong a single user
+        return $this->belongsTo('App\User');
+    }
 }

@@ -3,13 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+//bring in the store image file path
+use Illuminate\Support\Facades\Storage;
 //get the App\Post from namespace App from Post.php
 use App\Post;
 //use DB; can use the DB to access the database
 
 class PostsController extends Controller
 {
+      /**
+     * Create a new controller instance. keep non users or guest out off the user create and edit post
+     * ['except' => ['index', 'show']] each of Post 
+     * 
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['index', 'show']]);
+    }
+
     /**
      * Display a listing of the resource. use == php artisan make:controller PostsController --resource == --resource to create all the function that need to control the posts
      *
@@ -49,17 +61,35 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //image files, or no image, size
         $this->validate($request, [
             'title' => 'required',
-            'body'  => 'required'
+            'body'  => 'required',
+            'cover_image' => 'image|nullable|max:1999'
         ]);
-        
+        //Handle file upload php artisan storage:link to create the folder in the terminal
+        if($request->hasFile('cover_image')){
+            //get filename with extension
+            $filenameWithExt = $request->file('cover_image')->getClientOriginalName();
+            //get just filename
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            //get just ext
+            $extension = $request->file('cover_image')->getClientOriginalExtension();
+
+            //filename to store, get the file name, add the timestamp with unique time, and its extension
+            $fileNameToStore = $filename.'_'.time().'.'.$extension;
+            //upload image, create an folder name cover_images in the storage->app->pulic to store image upload in post
+            $path = $request->file('cover_image')->storeAs('public/cover_images', $fileNameToStore);
+        }else{
+            $fileNameToStore = 'noimage.jpg';
+        }
         
         //create post brought in on top Post, save the post in DB
         $post = new Post;
         $post->title = $request->input('title');
         $post->body = $request->input('body');
+        $post->user_id = auth()->user()->id;
+        $post->cover_image = $fileNameToStore;
         $post->save();
 
         return redirect('/posts')->with('success', 'Post Created');
@@ -88,6 +118,13 @@ class PostsController extends Controller
     public function edit($id)
     {
         //
+        $post = Post::find($id);
+        //check for correct user
+        if(auth()->user()->id !== $post->user_id){
+            return redirect('/posts')->with('error', 'Unauthorized Page');
+        }
+
+        return view('posts.edit')->with('post', $post);
     }
 
     /**
@@ -100,6 +137,36 @@ class PostsController extends Controller
     public function update(Request $request, $id)
     {
         //
+          $this->validate($request, [
+            'title' => 'required',
+            'body'  => 'required'
+        ]);
+        
+         //Handle file upload php artisan storage:link to create the folder in the terminal
+         if($request->hasFile('cover_image')){
+            //get filename with extension
+            $filenameWithExt = $request->file('cover_image')->getClientOriginalName();
+            //get just filename
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            //get just ext
+            $extension = $request->file('cover_image')->getClientOriginalExtension();
+
+            //filename to store, get the file name, add the timestamp with unique time, and its extension
+            $fileNameToStore = $filename.'_'.time().'.'.$extension;
+            //upload image, create an folder name cover_images in the storage->app->pulic to store image upload in post
+            $path = $request->file('cover_image')->storeAs('public/cover_images', $fileNameToStore);
+        }
+        
+        //create post brought in on top Post, save the post in DB
+        $post = Post::find($id);
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        if($request->hasFile('cover_image')){
+            $post->cover_image = $fileNameToStore;
+        }
+        $post->save();
+
+        return redirect('/posts')->with('success', 'Post Updated');
     }
 
     /**
@@ -111,5 +178,18 @@ class PostsController extends Controller
     public function destroy($id)
     {
         //
+        $post = Post::find($id);
+         //check for correct user
+         if(auth()->user()->id !== $post->user_id){
+            return redirect('/posts')->with('error', 'Unauthorized Page');
+        }
+
+        if($post->cover_image != 'noimage.jpg'){
+            //Delete Image
+            Storage::delete('public/cover_images/'.$post->cover_image);
+        }
+
+        $post->delete();
+        return redirect('/posts')->with('success', 'Post Removed');
     }
 }
